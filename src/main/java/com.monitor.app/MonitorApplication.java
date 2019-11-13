@@ -1,13 +1,13 @@
 package com.monitor.app;
 
-import com.monitor.app.entity.User;
-import com.monitor.app.repository.UserRepository;
+import com.monitor.app.entity.Resource;
+import com.monitor.app.repository.ResourceRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.util.stream.Stream;
+import java.util.LinkedList;
 
 @SpringBootApplication
 public class MonitorApplication {
@@ -16,14 +16,13 @@ public class MonitorApplication {
         SpringApplication.run(MonitorApplication.class, args);
     }
 
+
     @Bean
-    CommandLineRunner init(UserRepository userRepository) {
+    CommandLineRunner init(ResourceRepository resourceRepository) {
         return args -> {
-            Stream.of("John", "Julie", "Jennifer", "Helen", "Rachel").forEach(name -> {
-                User user = new User(name);
-                userRepository.save(user);
-            });
-            userRepository.findAll().forEach(System.out::println);
+            Resource project = new Resource("project", "", new LinkedList<>());
+            resourceRepository.save(project);
+            resourceRepository.findAll().forEach(System.out::println);
         };
     }
 }
