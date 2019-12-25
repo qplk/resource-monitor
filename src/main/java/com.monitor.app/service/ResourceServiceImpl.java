@@ -3,14 +3,16 @@ package com.monitor.app.service;
 import com.monitor.app.entity.Resource;
 import com.monitor.app.entity.User;
 import com.monitor.app.repository.ResourceRepository;
-import com.monitor.app.utils.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import static com.monitor.app.utils.UserUtils.concatFirstAndSecondNames;
 
 @Slf4j
 @Service
@@ -27,6 +29,8 @@ public class ResourceServiceImpl implements ResourceService {
         Queue<String> usersQueue = project.getUsersQueue();
         log.debug("Found project: {}", project);
 
+        //добавить проверку на добавление в очередь, не подряд
+
         if (StringUtils.isEmpty(project.getCurrentUser())) {
 
             if (usersQueue.isEmpty()) {
@@ -34,7 +38,7 @@ public class ResourceServiceImpl implements ResourceService {
                 return;
             }
 
-            if (usersQueue.peek().equals(UserUtils.concatFirstAndSecondNames(user))) {
+            if (usersQueue.peek().equals(concatFirstAndSecondNames(user))) {
                 moveUserFromQueueToResource(project, user, usersQueue);
                 return;
 
@@ -49,9 +53,16 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void releaseResource(User user) {
         Resource project = resourceRepository.findAll().stream().findFirst().get();
+        LinkedList<String> usersQueue = project.getUsersQueue();
 
-        if (project.getCurrentUser().equals(UserUtils.concatFirstAndSecondNames(user))) {
-            project.setCurrentUser(null);
+        if (project.getCurrentUser().equals(concatFirstAndSecondNames(user))) {
+            project.setCurrentUser(usersQueue.poll());
+            resourceRepository.save(project);
+            return;
+        }
+
+        if (usersQueue.contains(concatFirstAndSecondNames(user))) {
+            usersQueue.remove(concatFirstAndSecondNames(user));
             resourceRepository.save(project);
         }
     }
@@ -67,9 +78,9 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void updateCurrentUser(Resource resource, User user) {
-        log.debug("Updating project= {} that has current user= {} to user= {}", resource.getProjectName(), resource.getCurrentUser(), UserUtils.concatFirstAndSecondNames(user));
+        log.debug("Updating project= {} that has current user= {} to user= {}", resource.getProjectName(), resource.getCurrentUser(), concatFirstAndSecondNames(user));
 
-        resource.setCurrentUser(UserUtils.concatFirstAndSecondNames(user));
+        resource.setCurrentUser(concatFirstAndSecondNames(user));
         Resource updatedResource = resourceRepository.save(resource);
 
         log.debug("New current user= {}", updatedResource.getCurrentUser());
@@ -77,12 +88,12 @@ public class ResourceServiceImpl implements ResourceService {
 
     private void moveUserFromQueueToResource(Resource resource, User user, Queue<String> queue) {
         queue.poll();
-        resource.setCurrentUser(UserUtils.concatFirstAndSecondNames(user));
+        resource.setCurrentUser(concatFirstAndSecondNames(user));
         resourceRepository.save(resource);
     }
 
     private void addUserToQueue(Resource resource, User user, Queue<String> queue) {
-        queue.add(UserUtils.concatFirstAndSecondNames(user));
+        queue.add(concatFirstAndSecondNames(user));
         resourceRepository.save(resource);
     }
 }
