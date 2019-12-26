@@ -4,6 +4,7 @@ import com.monitor.app.entity.Resource;
 import com.monitor.app.entity.User;
 import com.monitor.app.repository.ResourceRepository;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,12 @@ public class ResourceServiceImplTest {
 
     @Autowired
     ResourceRepository resourceRepository;
+
+    @Before
+    public void cleanup() {
+        resourceRepository.deleteAll();
+        resourceRepository.save(new Resource("project", "", new LinkedList<>()));
+    }
 
     @Test
     public void takeFreeResourceTest() {
