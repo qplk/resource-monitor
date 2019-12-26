@@ -4,6 +4,7 @@ import com.monitor.app.entity.Resource;
 import com.monitor.app.entity.User;
 import com.monitor.app.repository.ResourceRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -18,18 +19,28 @@ import static com.monitor.app.utils.UserUtils.concatFirstAndSecondNames;
 @Service
 public class ResourceServiceImpl implements ResourceService {
 
+    private final ResourceRepository resourceRepository;
+
+    private static final String PROJECT_NOT_FOUND_MESSAGE = "No projects were found";
+
     @Autowired
-    private ResourceRepository resourceRepository;
+    public ResourceServiceImpl(ResourceRepository resourceRepository) {
+        this.resourceRepository = resourceRepository;
+    }
 
     @Override
     public void takeResource(User user) {
 
         //todo: make project configurable
-        Resource project = resourceRepository.findAll().stream().findFirst().get();
+        Resource project = resourceRepository.findAll().stream().findFirst().orElse(null);
+        if (project == null) {
+            log.error(PROJECT_NOT_FOUND_MESSAGE);
+            throw new ObjectNotFoundException(PROJECT_NOT_FOUND_MESSAGE, "project");
+        }
         Queue<String> usersQueue = project.getUsersQueue();
         log.debug("Found project: {}", project);
 
-        //добавить проверку на добавление в очередь, не подряд
+        //todo: добавить проверку на добавление в очередь, не подряд
 
         if (StringUtils.isEmpty(project.getCurrentUser())) {
 
@@ -52,7 +63,11 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void releaseResource(User user) {
-        Resource project = resourceRepository.findAll().stream().findFirst().get();
+        Resource project = resourceRepository.findAll().stream().findFirst().orElse(null);
+        if (project == null) {
+            log.error(PROJECT_NOT_FOUND_MESSAGE);
+            throw new ObjectNotFoundException(PROJECT_NOT_FOUND_MESSAGE, "project");
+        }
         LinkedList<String> usersQueue = project.getUsersQueue();
 
         if (project.getCurrentUser().equals(concatFirstAndSecondNames(user))) {
@@ -69,12 +84,22 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public List<String> getQueue() {
-        return resourceRepository.findAll().stream().findFirst().get().getUsersQueue();
+        Resource project = resourceRepository.findAll().stream().findFirst().orElse(null);
+        if (project == null) {
+            log.error(PROJECT_NOT_FOUND_MESSAGE);
+            throw new ObjectNotFoundException(PROJECT_NOT_FOUND_MESSAGE, "project");
+        }
+        return project.getUsersQueue();
     }
 
     @Override
     public String getCurrentUser() {
-        return resourceRepository.findAll().stream().findFirst().get().getCurrentUser();
+        Resource project = resourceRepository.findAll().stream().findFirst().orElse(null);
+        if (project == null) {
+            log.error(PROJECT_NOT_FOUND_MESSAGE);
+            throw new ObjectNotFoundException(PROJECT_NOT_FOUND_MESSAGE, "project");
+        }
+        return project.getCurrentUser();
     }
 
     private void updateCurrentUser(Resource resource, User user) {
