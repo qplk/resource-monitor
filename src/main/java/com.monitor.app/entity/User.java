@@ -9,4 +9,9 @@ public class User {
 
     private String secondName;
 
+    public User(String firstName, String secondName) {
+        this.firstName = firstName;
+        this.secondName = secondName;
+    }
+
 }

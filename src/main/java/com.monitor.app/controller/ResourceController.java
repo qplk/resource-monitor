@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
 public class ResourceController {
 
     private final ResourceService resourceService;
