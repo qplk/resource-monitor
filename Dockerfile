@@ -1,8 +1,7 @@
 FROM openjdk:11
 ADD target/resource-monitor*.jar /app/resource-monitor.jar
 
-COPY scripts/* /bin/
+COPY scripts/* /scripts/
+RUN chmod +x /scripts/*.sh
 
-ENTRYPOINT ["/bin/run.sh"]
-
-EXPOSE 8080
+ENTRYPOINT java -jar /app/resource-monitor.jar
