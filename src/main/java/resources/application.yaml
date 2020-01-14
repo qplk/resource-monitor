@@ -1,0 +1,6 @@
+logging:
+  level:
+    com.monitor.app: INFO
+    org.springframework: INFO
+resource-monitor:
+  property: value

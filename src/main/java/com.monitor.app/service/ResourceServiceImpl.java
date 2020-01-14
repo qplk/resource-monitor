@@ -103,12 +103,12 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void updateCurrentUser(Resource resource, User user) {
-        log.debug("Updating project= {} that has current user= {} to user= {}", resource.getProjectName(), resource.getCurrentUser(), concatFirstAndSecondNames(user));
+        log.debug("Updating project={} that has current user={} to user={}", resource.getProjectName(), resource.getCurrentUser(), concatFirstAndSecondNames(user));
 
         resource.setCurrentUser(concatFirstAndSecondNames(user));
         Resource updatedResource = resourceRepository.save(resource);
 
-        log.debug("New current user= {}", updatedResource.getCurrentUser());
+        log.debug("New current user={}", updatedResource.getCurrentUser());
     }
 
     private void moveUserFromQueueToResource(Resource resource, User user, Queue<String> queue) {

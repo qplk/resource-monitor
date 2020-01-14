@@ -24,7 +24,7 @@ public class ResourceController {
     //todo: add projectName in path variable (it should be determined on project icon in UI)
     @PostMapping(path = "/takeResource")
     public void takeResource(@RequestBody User user) {
-        log.debug("Try to take resource");
+        log.info("Try to take resource");
 
         if (Objects.nonNull(user)) {
             resourceService.takeResource(user);
@@ -34,7 +34,7 @@ public class ResourceController {
     //todo: add projectName in path variable (it should be determined on project icon in UI)
     @PostMapping(path = "/releaseResource")
     public void releaseResource(@RequestBody User user) {
-        log.debug("Try to take resource");
+        log.info("Try to release resource");
 
         if (Objects.nonNull(user)) {
             resourceService.releaseResource(user);
@@ -43,11 +43,13 @@ public class ResourceController {
 
     @GetMapping(path = "/getQueue")
     public List<String> getQueue() {
+        log.info("Try to get queue");
         return resourceService.getQueue();
     }
 
     @GetMapping(path = "/getCurrentUser")
     public String getCurrentUser() {
+        log.info("Try to get current user");
         return resourceService.getCurrentUser();
     }
 }
