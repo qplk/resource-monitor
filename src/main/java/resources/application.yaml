@@ -1,6 +1,6 @@
 logging:
   level:
-    com.monitor.app: INFO
+    com.monitor.app: ${LOG_LEVEL:DEBUG}
     org.springframework: INFO
 resource-monitor:
   property: value
