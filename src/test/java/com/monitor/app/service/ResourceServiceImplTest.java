@@ -78,4 +78,21 @@ public class ResourceServiceImplTest {
         Assert.assertEquals(1, usersQueue.size());
         Assert.assertTrue(usersQueue.contains("Third User"));
     }
+
+    @Test
+    public void takeResourceTwoTimesInRaw(){
+        resourceService.takeResource(new User("First", "User"));
+        resourceService.takeResource(new User("Second", "User"));
+        resourceService.takeResource(new User("Third", "User"));
+
+        resourceService.takeResource(new User("Third", "User"));
+        resourceService.takeResource(new User("First", "User"));
+
+        Resource project = resourceRepository.findResourceByProjectName("project");
+        LinkedList<String> usersQueue = project.getUsersQueue();
+
+        Assert.assertEquals(2, usersQueue.size());
+        Assert.assertTrue(usersQueue.contains("Second User"));
+        Assert.assertTrue(usersQueue.contains("Third User"));
+    }
 }

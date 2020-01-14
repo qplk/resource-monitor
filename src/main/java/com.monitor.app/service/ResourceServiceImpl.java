@@ -37,7 +37,7 @@ public class ResourceServiceImpl implements ResourceService {
             log.error(PROJECT_NOT_FOUND_MESSAGE);
             throw new ObjectNotFoundException(PROJECT_NOT_FOUND_MESSAGE, "project");
         }
-        Queue<String> usersQueue = project.getUsersQueue();
+        LinkedList<String> usersQueue = project.getUsersQueue();
         log.debug("Found project: {}", project);
 
         //todo: добавить проверку на добавление в очередь, не подряд
@@ -117,7 +117,10 @@ public class ResourceServiceImpl implements ResourceService {
         resourceRepository.save(resource);
     }
 
-    private void addUserToQueue(Resource resource, User user, Queue<String> queue) {
+    private void addUserToQueue(Resource resource, User user, LinkedList<String> queue) {
+        if (concatFirstAndSecondNames(user).equals(resource.getCurrentUser()) || queue.contains(concatFirstAndSecondNames(user))){
+            return;
+        }
         queue.add(concatFirstAndSecondNames(user));
         resourceRepository.save(resource);
     }
